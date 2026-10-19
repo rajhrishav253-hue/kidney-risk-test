@@ -72,11 +72,24 @@ export function AuthPage({ mode }: AuthPageProps) {
     setGoogleLoading(true);
     try {
       await signInWithGoogle();
-      // OAuth redirect happens in-browser; on return the auth state listener picks it up.
+      // signInWithOAuth redirects the browser to Google. If we reach here without
+      // a redirect, the provider may not be enabled — show a helpful message.
     } catch (err) {
       setGoogleLoading(false);
-      const msg = err instanceof Error ? err.message : 'Google sign-in failed.';
-      setError(msg);
+      const raw = err instanceof Error ? err.message : 'Google sign-in failed.';
+      const lower = raw.toLowerCase();
+      if (
+        lower.includes('provider') ||
+        lower.includes('not enabled') ||
+        lower.includes('oauth provider') ||
+        lower.includes('unsupported provider')
+      ) {
+        setError(
+          'Google sign-in is not enabled yet. Open Bolt → Database → Authentication → Continue with Google, turn it on, and paste your Google Client ID and Secret. See the Google SSO guide in Bolt Support.'
+        );
+      } else {
+        setError(raw);
+      }
     }
   }
 
