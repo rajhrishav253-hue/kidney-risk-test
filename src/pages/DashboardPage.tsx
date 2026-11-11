@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react';
-import { Activity, ArrowRight, ClipboardList, TrendingUp, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { Activity, ArrowRight, ClipboardList, TrendingUp, AlertTriangle, CheckCircle2, Sparkles } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { seedSampleAssessments } from '@/lib/assessments';
 import { useAuth } from '@/lib/auth';
 import { useRouter } from '@/lib/router';
 import type { AssessmentRecord } from '@/lib/types';
 import { LineChart } from '@/components/Charts';
-import { FullPageSpinner, DisclaimerBanner } from '@/components/ui';
+import { FullPageSpinner, DisclaimerBanner, Spinner } from '@/components/ui';
 
 export function DashboardPage() {
   const { user, profile } = useAuth();
@@ -13,24 +14,41 @@ export function DashboardPage() {
   const [records, setRecords] = useState<AssessmentRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [seeding, setSeeding] = useState(false);
+  const [seedError, setSeedError] = useState<string | null>(null);
+
+  const loadRecords = useCallback(async () => {
+    if (!user) return;
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('assessments')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: true });
+    if (error) {
+      setError(error.message);
+    } else {
+      setRecords((data ?? []) as AssessmentRecord[]);
+    }
+    setLoading(false);
+  }, [user]);
 
   useEffect(() => {
-    if (!user) return;
-    (async () => {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('assessments')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: true });
-      if (error) {
-        setError(error.message);
-      } else {
-        setRecords((data ?? []) as AssessmentRecord[]);
-      }
-      setLoading(false);
-    })();
-  }, [user]);
+    void loadRecords();
+  }, [loadRecords]);
+
+  async function handleLoadSample() {
+    setSeeding(true);
+    setSeedError(null);
+    try {
+      await seedSampleAssessments();
+    } catch (err) {
+      setSeedError(err instanceof Error ? err.message : 'Could not load sample data.');
+    } finally {
+      setSeeding(false);
+      await loadRecords();
+    }
+  }
 
   if (loading) return <FullPageSpinner label="Loading your dashboard…" />;
 
@@ -161,6 +179,15 @@ export function DashboardPage() {
               >
                 Run your first assessment <ArrowRight size={14} />
               </button>
+              <button
+                onClick={handleLoadSample}
+                disabled={seeding}
+                className="btn-ghost mt-3 inline-flex items-center gap-2 text-sm"
+              >
+                {seeding ? <Spinner /> : <Sparkles size={14} />}
+                {seeding ? 'Loading samples…' : 'Load sample data'}
+              </button>
+              {seedError && <p className="mt-3 text-xs text-red-300">{seedError}</p>}
             </div>
           )}
         </div>

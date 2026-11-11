@@ -3,7 +3,7 @@ import { Info, FlaskConical, AlertCircle, ArrowRight, RotateCcw, Sparkles } from
 import { numericFields, boolFields, optionalFields, emptyAssessment, samplePresets } from '@/lib/fields';
 import type { AssessmentInput, PredictionResponse } from '@/lib/types';
 import { predictRisk } from '@/lib/api';
-import { supabase } from '@/lib/supabase';
+import { saveAssessment } from '@/lib/assessments';
 import { useRouter } from '@/lib/router';
 import { DisclaimerBanner, Spinner } from '@/components/ui';
 import { ResultPanel } from '@/components/ResultPanel';
@@ -48,22 +48,8 @@ export function AssessmentPage() {
     try {
       const prediction = await predictRisk(input);
 
-      const { data, error } = await supabase
-        .from('assessments')
-        .insert({
-          ...input,
-          model_version: prediction.model_version,
-          predicted_class: prediction.predicted_class,
-          risk_score: prediction.risk_score,
-          input_values: input as unknown as Record<string, unknown>,
-        })
-        .select('id')
-        .maybeSingle();
-
-      if (error) throw new Error(`Failed to save assessment: ${error.message}`);
+      await saveAssessment(input, prediction);
       setResult(prediction);
-      // keep the id for navigation if needed
-      void data;
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Prediction failed.';
       setGlobalError(msg);
