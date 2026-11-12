@@ -1,6 +1,6 @@
-// AI KidneyGuard — ML inference edge function
-// Logistic regression model trained on the UCI Chronic Kidney Disease dataset.
-// This is an EDUCATIONAL risk-assessment prototype, not a clinical diagnostic tool.
+// AI KidneyGuard — experimental prediction demonstration edge function.
+// Embedded coefficients are not backed by a reproducible training artifact.
+// This is an EDUCATIONAL prototype, not a clinical diagnostic tool.
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -8,13 +8,14 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
 
-const MODEL_VERSION = "ckd-lr-v1.0.0";
+const MODEL_VERSION = "ckd-lr-demo-baseline-v1.1.0";
 
 // Feature order MUST match the training pipeline. Numeric features are
 // standardized using (x - mean) / std. Categorical features are 0/1 encoded.
-// Coefficients below were fit on the UCI CKD dataset (400 rows, stratified
-// 80/20 split) using scikit-learn LogisticRegression(C=1.0).
-// See dataset/README for column definitions and units.
+// The repository does not include a reproducible training pipeline or model artifact.
+// These embedded coefficients and preprocessing constants are therefore an
+// unverified demonstration baseline, not independently validated clinical ML.
+// Do not report model accuracy or clinical performance from this implementation.
 const FEATURES = [
   "age",
   "blood_pressure",
@@ -191,16 +192,6 @@ function predict(values: Record<string, number>): {
   return { riskScore, predictedClass, z };
 }
 
-const EVAL_METRICS = {
-  accuracy: 0.975,
-  precision: 0.974,
-  recall: 1.0,
-  f1: 0.987,
-  roc_auc: 0.992,
-  specificity: 0.941,
-  sensitivity: 1.0,
-};
-
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 200, headers: corsHeaders });
@@ -245,9 +236,8 @@ Deno.serve(async (req: Request) => {
           predictedClass === "ckd" ? "Elevated risk of chronic kidney disease" : "Low risk of chronic kidney disease",
         risk_score: Number(riskScore.toFixed(4)),
         logit: Number(z.toFixed(4)),
-        evaluation_metrics: EVAL_METRICS,
         disclaimer:
-          "This is an experimental ML risk classification from an educational prototype trained on the UCI Chronic Kidney Disease dataset. It is NOT a medical diagnosis or a clinically calibrated probability. Always consult a qualified healthcare professional.",
+          "This is an experimental score from an educational demonstration baseline. The repository does not include a reproducible training or clinical validation pipeline. It is NOT a medical diagnosis or a clinically calibrated probability. Always consult a qualified healthcare professional.",
         submitted_values: result.values,
         generated_at: new Date().toISOString(),
       }),

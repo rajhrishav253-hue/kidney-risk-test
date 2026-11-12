@@ -234,7 +234,7 @@ export function Gauge({
         <span className="font-[Space_Grotesk] text-3xl font-bold text-white">
           {Math.round(pct * 100)}%
         </span>
-        <span className="text-[10px] uppercase tracking-wider text-slate-400">risk score</span>
+        <span className="text-[10px] uppercase tracking-wider text-slate-400">model score</span>
       </div>
     </div>
   );
