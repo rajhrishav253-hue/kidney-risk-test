@@ -1,6 +1,6 @@
-// AI KidneyGuard — ML inference edge function
-// Logistic regression model trained on the UCI Chronic Kidney Disease dataset.
-// This is an EDUCATIONAL risk-assessment prototype, not a clinical diagnostic tool.
+// AI KidneyGuard — experimental prediction demonstration edge function.
+// Embedded coefficients are not backed by a reproducible training artifact.
+// This is an EDUCATIONAL prototype, not a clinical diagnostic tool.
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
