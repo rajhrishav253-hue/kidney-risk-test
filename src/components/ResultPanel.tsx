@@ -81,14 +81,14 @@ export function ResultPanel({ result, input, onNew, onHistory }: ResultPanelProp
             </h2>
             <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-300">
               {isCkd
-                ? 'The model classified this set of measurements as consistent with chronic kidney disease. This is an experimental ML risk classification — not a confirmed diagnosis. Several of the submitted values strongly influence this result. Please review them with a qualified healthcare professional.'
-                : 'The model classified this set of measurements as not consistent with chronic kidney disease. This is an experimental ML risk classification and not a guarantee of kidney health. Continue routine care and consult a healthcare professional for clinical evaluation.'}
+                ? 'The model classified this set of measurements as consistent with chronic kidney disease. This is an experimental ML risk classification — not a confirmed diagnosis. The score is not a calibrated probability and has not been clinically validated. Please review your measurements with a qualified healthcare professional.'
+                : 'The model classified this set of measurements as not consistent with chronic kidney disease. This is an experimental model classification and not a guarantee of kidney health. The score is not clinically validated. Continue routine care and consult a healthcare professional for clinical evaluation.'}
             </p>
             <div className="mt-4 flex flex-wrap gap-2 text-xs">
               <span className="chip">
                 <Clock size={11} /> {date.toLocaleDateString()}
               </span>
-              <span className="chip">Risk score: {result.risk_score.toFixed(3)}</span>
+              <span className="chip">Model score: {result.risk_score.toFixed(3)}</span>
               <span className="chip">Logit: {result.logit.toFixed(3)}</span>
               <span className="chip">Model: {result.model_version}</span>
             </div>
@@ -117,40 +117,6 @@ export function ResultPanel({ result, input, onNew, onHistory }: ResultPanelProp
               </div>
             );
           })}
-        </div>
-      </div>
-
-      {/* Model metrics */}
-      <div className="card mt-6 p-6">
-        <h3 className="mb-1 font-[Space_Grotesk] text-lg font-semibold text-white">
-          Model evaluation metrics
-        </h3>
-        <p className="mb-4 text-xs text-slate-400">
-          Performance on a held-out stratified 20% test split of the UCI CKD dataset.
-          These describe the model overall, not an individual's calibrated probability.
-        </p>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {[
-            { m: 'Accuracy', v: result.evaluation_metrics.accuracy },
-            { m: 'Precision', v: result.evaluation_metrics.precision },
-            { m: 'Recall', v: result.evaluation_metrics.recall },
-            { m: 'F1-score', v: result.evaluation_metrics.f1 },
-            { m: 'ROC-AUC', v: result.evaluation_metrics.roc_auc },
-            { m: 'Sensitivity', v: result.evaluation_metrics.sensitivity },
-            { m: 'Specificity', v: result.evaluation_metrics.specificity },
-          ].map((x) => (
-            <div
-              key={x.m}
-              className="rounded-xl border border-cyan-500/10 bg-[#060b1a]/60 p-4 text-center"
-            >
-              <p className="font-[Space_Grotesk] text-lg font-bold text-cyan-300">
-                {(x.v as number).toFixed(3)}
-              </p>
-              <p className="mt-1 text-[10px] uppercase tracking-wider text-slate-500">
-                {x.m}
-              </p>
-            </div>
-          ))}
         </div>
       </div>
 
