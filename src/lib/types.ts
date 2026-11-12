@@ -27,15 +27,6 @@ export interface PredictionResponse {
   risk_label: string;
   risk_score: number;
   logit: number;
-  evaluation_metrics: {
-    accuracy: number;
-    precision: number;
-    recall: number;
-    f1: number;
-    roc_auc: number;
-    specificity: number;
-    sensitivity: number;
-  };
   disclaimer: string;
   submitted_values: Record<string, number>;
   generated_at: string;
