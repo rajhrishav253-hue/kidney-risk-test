@@ -104,7 +104,7 @@ export function DashboardPage() {
         />
         <StatCard
           icon={<TrendingUp size={20} />}
-          label="Average risk score"
+          label="Average model score"
           value={avgScore.toFixed(3)}
         />
         <StatCard
@@ -147,7 +147,7 @@ export function DashboardPage() {
                 {((latest.risk_score ?? 0) * 100).toFixed(0)}%
               </p>
               <p className="mt-1 text-xs uppercase tracking-wider text-slate-500">
-                risk score
+                model score
               </p>
               <div className="mt-4 space-y-1.5 text-sm text-slate-400">
                 <div className="flex justify-between">
@@ -197,9 +197,9 @@ export function DashboardPage() {
             Risk score trend
           </h3>
           <p className="mb-4 text-xs text-slate-400">
-            Your risk score across all assessments, oldest to newest.
+            Your model score across all assessments, oldest to newest.
           </p>
-          <LineChart data={trendData} yMin={0} yMax={1} yLabel="risk score" />
+          <LineChart data={trendData} yMin={0} yMax={1} yLabel="model score" />
         </div>
       </div>
 
