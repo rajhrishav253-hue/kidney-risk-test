@@ -36,7 +36,16 @@ export async function predictRisk(
   }
 
   const data: PredictionResponse = await res.json();
-  if (!data || !data.predicted_class || typeof data.risk_score !== 'number') {
+  if (
+    !data ||
+    !['ckd', 'no_ckd'].includes(data.predicted_class) ||
+    typeof data.risk_score !== 'number' ||
+    !Number.isFinite(data.risk_score) ||
+    data.risk_score < 0 ||
+    data.risk_score > 1 ||
+    typeof data.model_version !== 'string' ||
+    typeof data.generated_at !== 'string'
+  ) {
     throw new Error('Invalid prediction response from model service.');
   }
   return data;
